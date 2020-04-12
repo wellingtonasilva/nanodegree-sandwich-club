@@ -15,6 +15,7 @@ public class DetailActivity extends AppCompatActivity {
 
     public static final String EXTRA_POSITION = "extra_position";
     private static final int DEFAULT_POSITION = -1;
+    int position;
     TextView alsoKnownAs;
     TextView ingredients;
     TextView placeOfOrigin;
@@ -36,7 +37,12 @@ public class DetailActivity extends AppCompatActivity {
             closeOnError();
         }
 
-        int position = intent.getIntExtra(EXTRA_POSITION, DEFAULT_POSITION);
+        if (savedInstanceState == null) {
+            position = intent.getIntExtra(EXTRA_POSITION, DEFAULT_POSITION);
+        } else {
+            position = savedInstanceState.getInt(EXTRA_POSITION);
+        }
+
         if (position == DEFAULT_POSITION) {
             // EXTRA_POSITION not found in intent
             closeOnError();
@@ -44,7 +50,7 @@ public class DetailActivity extends AppCompatActivity {
         }
 
         String[] sandwiches = getResources().getStringArray(R.array.sandwich_details);
-        String json = sandwiches[position];
+        String json = sandwiches[position];position = intent.getIntExtra(EXTRA_POSITION, DEFAULT_POSITION);
         Sandwich sandwich = JsonUtils.parseSandwichJson(json);
         if (sandwich == null) {
             // Sandwich data unavailable
@@ -58,6 +64,17 @@ public class DetailActivity extends AppCompatActivity {
                 .into(ingredientsIv);
 
         setTitle(sandwich.getMainName());
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt(EXTRA_POSITION, position);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
     }
 
     private void closeOnError() {
